@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LENS — Your screenshots, finally organized</title>
+<meta name="description" content="LENS uses 100% on-device AI to auto-sort your screenshots into 24 smart folders and lets you search the text inside them. Nothing ever leaves your iPhone.">
+<link rel="icon" href="assets/icon.png">
+<style>
+  :root{
+    --void:#09090B; --surface:#141416; --lift:#1C1C20; --wire:#27272A;
+    --ink:#F4F4F5; --muted:#9CA3AF; --pulse:#6366F1; --violet:#8B5CF6; --confirm:#22C55E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:"SF Mono",ui-monospace,Menlo,monospace}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(180%) blur(20px);background:rgba(9,9,11,.72);border-bottom:1px solid var(--wire)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.04em}
+  .brand img{width:30px;height:30px;border-radius:8px}
+  .navlinks{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+  .navlinks a:hover{color:var(--ink)}
+  .cta{background:linear-gradient(135deg,var(--pulse),var(--violet));color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;font-size:14px;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 24px rgba(99,102,241,.3)}
+  .cta:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(99,102,241,.45)}
+  @media(max-width:680px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{position:relative;text-align:center;padding:110px 0 80px}
+  .glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:760px;height:520px;background:radial-gradient(closest-side,rgba(99,102,241,.42),rgba(139,92,246,.12),transparent);filter:blur(20px);z-index:-1}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--wire);background:var(--surface);border-radius:999px;padding:7px 16px;font-size:12.5px;color:var(--muted);margin-bottom:28px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--confirm);box-shadow:0 0 10px var(--confirm)}
+  h1{font-size:clamp(40px,7vw,76px);line-height:1.04;font-weight:850;letter-spacing:-.03em}
+  .grad{background:linear-gradient(120deg,var(--pulse),var(--violet) 60%,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{max-width:640px;margin:24px auto 0;font-size:clamp(17px,2.4vw,21px);color:var(--muted)}
+  .herobtns{display:flex;gap:14px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+  .btn-ghost{border:1px solid var(--wire);padding:13px 22px;border-radius:12px;font-weight:600;font-size:15px;color:var(--ink)}
+  .btn-ghost:hover{background:var(--surface)}
+  .btn-primary{background:linear-gradient(135deg,var(--pulse),var(--violet));color:#fff;padding:14px 26px;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 8px 30px rgba(99,102,241,.4)}
+
+  .shots{display:flex;gap:20px;justify-content:center;margin-top:70px;flex-wrap:wrap}
+  .shots img{width:240px;border-radius:28px;border:1px solid var(--wire);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .shots img:nth-child(even){transform:translateY(18px)}
+  @media(max-width:680px){.shots img{width:150px}.shots img:nth-child(n+3){display:none}}
+
+  /* sections */
+  section{padding:90px 0}
+  .eyebrow{color:var(--pulse);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+  h2{font-size:clamp(28px,4.4vw,46px);font-weight:820;letter-spacing:-.02em;line-height:1.1}
+  .lead{color:var(--muted);font-size:18px;max-width:560px;margin-top:16px}
+
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  @media(max-width:860px){.feats{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--wire);border-radius:20px;padding:28px;transition:border-color .2s,transform .2s}
+  .card:hover{border-color:var(--pulse);transform:translateY(-3px)}
+  .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(139,92,246,.12));border:1px solid var(--wire);margin-bottom:18px}
+  .card h3{font-size:19px;font-weight:750;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:15px}
+
+  /* privacy band */
+  .band{background:linear-gradient(180deg,var(--surface),var(--void));border-top:1px solid var(--wire);border-bottom:1px solid var(--wire);text-align:center}
+  .privrow{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+  .privrow div{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:15px}
+  .privrow b{color:var(--ink)}
+
+  /* pricing */
+  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  @media(max-width:860px){.prices{grid-template-columns:1fr}}
+  .price{background:var(--surface);border:1px solid var(--wire);border-radius:20px;padding:30px;position:relative}
+  .price.best{border-color:var(--pulse);box-shadow:0 0 0 1px var(--pulse),0 20px 60px rgba(99,102,241,.18)}
+  .tag{position:absolute;top:-12px;left:30px;background:linear-gradient(135deg,var(--pulse),var(--violet));color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;padding:5px 12px;border-radius:999px}
+  .price .amt{font-size:38px;font-weight:850;margin:6px 0}
+  .price .per{color:var(--muted);font-size:14px}
+  .price p{color:var(--muted);font-size:14px;margin-top:14px}
+
+  footer{border-top:1px solid var(--wire);padding:50px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px}
+  footer a:hover{color:var(--ink)}
+  .flinks{display:flex;gap:22px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="/lens/"><img src="assets/icon.png" alt="LENS">LENS</a>
+  <div class="navlinks">
+    <a href="#features">Features</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#pricing">Pricing</a>
+    <a href="support.html">Support</a>
+  </div>
+  <a class="cta" href="#download">Get LENS</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="glow"></div>
+  <span class="chip"><span class="dot"></span> 100% on-device AI · nothing leaves your iPhone</span>
+  <h1>Your screenshots,<br><span class="grad">finally organized.</span></h1>
+  <p class="sub">LENS scans your whole screenshot library and auto-sorts every one into 24 smart, searchable folders — in about 60 seconds. No tagging. No filing. No cloud.</p>
+  <div class="herobtns">
+    <a class="btn-primary" href="#download">Download for iPhone</a>
+    <a class="btn-ghost" href="#features">See how it works</a>
+  </div>
+  <div class="shots">
+    <img src="assets/scan.png" alt="Auto-sorting screenshots">
+    <img src="assets/home.png" alt="Smart folders">
+    <img src="assets/search.png" alt="Search inside screenshots">
+    <img src="assets/duplicates.png" alt="Duplicate cleaner">
+  </div>
+</div></header>
+
+<section id="features"><div class="wrap">
+  <div class="eyebrow">What it does</div>
+  <h2>Order out of screenshot chaos.</h2>
+  <p class="lead">Everything runs on Apple's Vision framework and the Neural Engine, right on your device.</p>
+  <div class="feats">
+    <div class="card"><div class="ic">🗂️</div><h3>24 smart folders</h3><p>Receipts, recipes, passwords & Wi-Fi, code, tickets, QR codes, memes and more — recognized and filed automatically.</p></div>
+    <div class="card"><div class="ic">🔎</div><h3>Search inside screenshots</h3><p>Type “wifi password” or a confirmation number and the exact screenshot appears. LENS reads every word in every image.</p></div>
+    <div class="card"><div class="ic">🧹</div><h3>Duplicate cleaner</h3><p>Find near-identical and repeated screenshots and free up hundreds of MB in a couple of taps.</p></div>
+    <div class="card"><div class="ic">⚡</div><h3>The 60-second magic</h3><p>Open the app and watch years of clutter sort itself in real time. No setup, no account, no work.</p></div>
+    <div class="card"><div class="ic">⚙️</div><h3>Always up to date</h3><p>New screenshots are quietly filed in the background, so your library stays organized without a thought.</p></div>
+    <div class="card"><div class="ic">📤</div><h3>Export & share</h3><p>Send a whole category as a PDF or share individual screenshots — perfect for receipts and expense reports.</p></div>
+  </div>
+</div></section>
+
+<section id="privacy" class="band"><div class="wrap">
+  <div class="eyebrow">Privacy by design</div>
+  <h2>Nothing ever leaves your iPhone.</h2>
+  <p class="lead" style="margin-left:auto;margin-right:auto">Privacy isn’t a setting you switch on. It’s the only way LENS works.</p>
+  <div class="privrow">
+    <div>🔒 <b>No servers.</b> No cloud. No uploads.</div>
+    <div>🙅 <b>No account.</b> No sign-up. No email.</div>
+    <div>👁️ <b>Seen by no one</b> but you.</div>
+  </div>
+</div></section>
+
+<section id="pricing"><div class="wrap">
+  <div class="eyebrow">Pricing</div>
+  <h2>Free to try. Pro unlocks everything.</h2>
+  <p class="lead">Scan your whole library and browse 6 categories free. Start a 3-day free trial of LENS Pro for the rest.</p>
+  <div class="prices">
+    <div class="price best"><span class="tag">BEST VALUE</span><div class="per">Annual</div><div class="amt">$14.99<span class="per"> /year</span></div><div class="per">about $1.25 / month</div><p>All 24 categories · full-text search · unlimited duplicate cleaning · auto-scan · export.</p></div>
+    <div class="price"><div class="per">Weekly</div><div class="amt">$2.99<span class="per"> /week</span></div><div class="per">try it week by week</div><p>Everything in LENS Pro, billed weekly. Cancel anytime.</p></div>
+    <div class="price"><div class="per">Lifetime</div><div class="amt">$39.99<span class="per"> once</span></div><div class="per">no subscription</div><p>Pay once, own LENS Pro forever. One-time purchase.</p></div>
+  </div>
+</div></section>
+
+<section id="download"><div class="wrap" style="text-align:center">
+  <div class="glow" style="opacity:.6"></div>
+  <h2>Run one scan. Never lose a screenshot again.</h2>
+  <p class="lead" style="margin:16px auto 32px">Available for iPhone, iPad and Mac.</p>
+  <a class="btn-primary" href="#" id="appstore">Download on the App Store</a>
+  <p class="per" style="margin-top:16px;color:var(--muted)">Coming soon to the App Store.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <div><span class="brand"><img src="assets/icon.png" style="width:22px;height:22px" alt="">LENS</span><br><span style="font-size:13px">© 2026 LENS. Made with care for your camera roll.</span></div>
+  <div class="flinks">
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="support.html">Support</a>
+  </div>
+</div></footer>
+
+</body>
+</html>
